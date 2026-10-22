@@ -1,5 +1,13 @@
 # Roadmap Inicial
 
+## Situacao em 2026-10-22
+
+Fundacao e prototipo de combate foram revisados. Existe uma cena 2x2 com seis acoes, selecao de alvo, contador, barras e reinicio. Compilacao, regras e integracao em Play Mode foram verificadas. O detalhamento esta em project-review-2026-10-22.md.
+
+O jogador aprovou o balanceamento apos testar decisao de 10s, escala ATB 1.8 e planos por aliado. Esses valores passam a ser a referencia desta etapa.
+
+Novo marco implementado: percurso de exploracao conectado a batalha, retorno ao mapa, desbloqueio de marco e mudanca visual simplificada entre duas eras. O roteiro de teste e os limites estao em exploration-prototype.md. As fases abaixo continuam como planejamento de produto; nao representam uma lista de funcionalidades ja implementadas.
+
 ## Fase 1 - Fundacao do projeto
 
 - consolidar o conceito de `JRPG Tagmar`
@@ -38,7 +46,7 @@
 ## Decisoes recomendadas para agora
 
 - priorizar `PC` como plataforma principal
-- usar `Unity LTS`
+- usar `Unity 6.5 (6000.5.6f1)`
 - comecar pelo `sistema de combate`
 - deixar `mobile` para fase posterior
 - limitar a primeira versao a `1 combate vertical slice + 1 ideia de evolucao visual`

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31293872b6f65ae46bb072f1e1b2630c, type: 3}
+  m_Name: Action_PassTurn
+  m_EditorClassIdentifier: Assembly-CSharp::Game01.Combat.Data.CombatActionDefinition
+  actionId: action.pass_turn
+  displayName: Passar Turno
+  actionType: 8
+  targetType: 1
+  timeCost: 100
+  manaCost: 0
+  basePower: 0

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9126e0fd28dc2494d9d6efc2b5b3d3de, type: 3}
+  m_Name: Combatant_Hero
+  m_EditorClassIdentifier: Assembly-CSharp::Game01.Combat.Data.CombatantDefinition
+  combatantId: combatant.hero
+  displayName: Heroi
+  stats:
+    maxHP: 120
+    maxMP: 20
+    habilidade: 12
+    bonusClasse: 2
+    bonusEquipamento: 1
+    penalidadeArmadura: 1
+    penalidadePeso: 0
+    ataque: 12
+    defesa: 6
+    poderMagico: 6
+  availableActions:
+  - {fileID: 11400000, guid: 5421b3b2b20086d4c8bde6bd357ec3c3, type: 2}
+  - {fileID: 11400000, guid: 19e95a4fa9004b944999514a1b496e2a, type: 2}
+  - {fileID: 11400000, guid: 6aaae588d25617e40a1ba857bc4ac3ca, type: 2}
+  - {fileID: 11400000, guid: c8ec868681340aa4aa1cdeca5da1a299, type: 2}
+  - {fileID: 11400000, guid: 1fa6136c2afd478438fd351eb8ac5fa6, type: 2}
+  - {fileID: 11400000, guid: f21a4a89355d9e64bb65d156e7d86836, type: 2}
