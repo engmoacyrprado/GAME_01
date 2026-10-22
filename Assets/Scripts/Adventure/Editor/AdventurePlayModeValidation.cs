@@ -19,6 +19,9 @@ namespace Game01.Adventure.Editor
         private static Vector2 _start;
         private static double _started;
         private static string _error;
+        private static int _narrativeStage;
+        private static Vector2 _introPosition;
+        private static int _captureAfterFrame;
 
         static AdventurePlayModeValidation()
         {
@@ -58,8 +61,46 @@ namespace Game01.Adventure.Editor
                 if (EditorApplication.timeSinceStartup - _started > 55) throw new Exception("Adventure test timed out.");
                 var exploration = Object.FindFirstObjectByType<ExplorationController>();
                 var battle = Object.FindFirstObjectByType<BattleDebugBootstrap>();
+                if (_stage == 0 && exploration != null && exploration.Narrative != null)
+                {
+                    var narrative = exploration.Narrative;
+                    if (narrative.BlocksExploration)
+                    {
+                        if (_narrativeStage == 0)
+                        {
+                            _introPosition = exploration.Body.position;
+                            exploration.MovementSource = () => Vector2.right;
+                            Capture("Logs/story-opening.png");
+                            narrative.BeginIntroduction();
+                            _until = Time.realtimeSinceStartup + 0.25f;
+                            _narrativeStage = 1;
+                        }
+                        else if (_narrativeStage == 1 && Time.realtimeSinceStartup >= _until)
+                        {
+                            Check(Vector2.Distance(exploration.Body.position, _introPosition) < 0.02f, "Player moved during dialogue.");
+                            narrative.Advance(); _narrativeStage = 2; _captureAfterFrame = Time.frameCount + 2;
+                        }
+                        else if (_narrativeStage == 2 && Time.frameCount >= _captureAfterFrame)
+                        {
+                            Capture("Logs/story-dialogue.png");
+                            narrative.Advance(); _narrativeStage = 3; _captureAfterFrame = Time.frameCount + 2;
+                        }
+                        else if (_narrativeStage == 3 && Time.frameCount >= _captureAfterFrame)
+                        {
+                            Capture("Logs/story-choices.png");
+                            Check(narrative.Session.Current.choices.Count == 2 && !narrative.Advance(), "Response choice was skipped.");
+                            narrative.Choose(0);
+                            Check(AdventureRuntime.Run.Responses["question"] == "ask_world", "Response was not recorded.");
+                            _narrativeStage = 4;
+                        }
+                        else if (_narrativeStage == 4) narrative.Advance();
+                        return;
+                    }
+                    if (narrative.InputConsumedThisFrame) return;
+                }
                 if (_stage == 0 && exploration != null && exploration.Body != null)
                 {
+                    exploration.Body.position = new Vector2(-12, -5);
                     Check(!exploration.TryInteract(), "Interaction activated from too far away.");
                     _start = exploration.Body.position;
                     exploration.MovementSource = () => Vector2.right;
@@ -108,6 +149,7 @@ namespace Game01.Adventure.Editor
                 else if (_stage == 5 && exploration != null && exploration.Body != null)
                 {
                     Check(AdventureRuntime.Run.EncounterWon && !AdventureRuntime.Run.EncounterActive, "Map did not retain victory.");
+                    Check(AdventureRuntime.Run.IntroductionSeen && !exploration.Narrative.BlocksExploration, "Introduction replayed after battle.");
                     Check(Vector2.Distance(exploration.Body.position, new Vector2(-1.2f, 0)) < 0.2f, "Map did not restore player position.");
                     Check(GameObject.Find("EncounterWolf") == null, "Cleared enemy respawned.");
                     exploration.Body.position = new Vector2(9, 4);
@@ -142,13 +184,17 @@ namespace Game01.Adventure.Editor
         private static void Capture(string path)
         {
             var camera = Camera.main;
-            var canvas = Object.FindFirstObjectByType<Canvas>();
+            var canvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            var modes = canvases.Select(canvas => canvas.renderMode).ToArray();
             var texture = new RenderTexture(1280, 720, 24);
             var pixels = new Texture2D(1280, 720, TextureFormat.RGB24, false);
             var previous = RenderTexture.active;
             try
             {
-                canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = camera; canvas.planeDistance = 1;
+                foreach (var canvas in canvases)
+                {
+                    canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = camera; canvas.planeDistance = 1;
+                }
                 camera.targetTexture = texture;
                 Canvas.ForceUpdateCanvases(); camera.Render(); RenderTexture.active = texture;
                 pixels.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); pixels.Apply();
@@ -156,7 +202,8 @@ namespace Game01.Adventure.Editor
             }
             finally
             {
-                camera.targetTexture = null; canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                camera.targetTexture = null;
+                for (var i = 0; i < canvases.Length; i++) canvases[i].renderMode = modes[i];
                 RenderTexture.active = previous; Object.DestroyImmediate(pixels); Object.DestroyImmediate(texture);
             }
         }

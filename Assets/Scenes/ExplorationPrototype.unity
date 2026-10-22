@@ -231,6 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e22bd0f898c83e94ebbabeb70d808fcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game01.Adventure.ExplorationController
+  introduction: {fileID: 11400000, guid: 8f9e211d5c89ae84abffa7aedbd4ffb0, type: 2}
 --- !u!4 &1578310075
 Transform:
   m_ObjectHideFlags: 0

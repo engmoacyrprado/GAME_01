@@ -2,6 +2,7 @@ using System;
 using Game01.Combat.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Game01.Narrative;
 
 namespace Game01.Adventure
 {
@@ -13,6 +14,11 @@ namespace Game01.Adventure
         public const float MoveSpeed = 4f;
         public Rigidbody2D Body { get; private set; }
         public Func<Vector2> MovementSource { get; set; }
+        [SerializeField] private DialogueGraph introduction;
+        public DialogueGraph Introduction => introduction;
+        public NarrativePresenter Narrative { get; private set; }
+        private Transform _guide;
+        public void ConfigureNarrative(DialogueGraph graph) { introduction = graph; }
         private ExplorationWorld _world;
         private ExplorationHud _hud;
         private WorldActorView _actor;
@@ -36,12 +42,24 @@ namespace Game01.Adventure
             var collider = player.AddComponent<CircleCollider2D>(); collider.radius = 0.28f;
             _actor = player.AddComponent<WorldActorView>(); _actor.Configure("hero", run.Era);
             _hud = new ExplorationHud(transform, RestartJourney);
+            var guide = new GameObject("GuideMage");
+            guide.transform.SetParent(transform, false);
+            guide.transform.position = AdventureRun.Spawn + new Vector2(1.5f, 0.7f);
+            guide.AddComponent<WorldActorView>().Configure("mage", run.Era);
+            _guide = guide.transform;
+            Narrative = gameObject.AddComponent<NarrativePresenter>();
+            Narrative.Configure(introduction, run, player.transform, _guide);
             FollowCamera(true);
         }
 
         private void FixedUpdate()
         {
             if (Body == null || _loading) return;
+            if (Narrative.BlocksExploration)
+            {
+                Body.linearVelocity = Vector2.zero; _actor.Movement = Vector2.zero;
+                return;
+            }
             var input = MovementSource != null ? MovementSource() : new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             Body.linearVelocity = Vector2.ClampMagnitude(input, 1f) * MoveSpeed;
             _actor.Movement = Body.linearVelocity;
@@ -52,6 +70,7 @@ namespace Game01.Adventure
         {
             if (Body == null || _loading) return;
             _hud.Refresh(AdventureRuntime.Run, Body.position, GetPrompt());
+            if (Narrative.BlocksExploration || Narrative.InputConsumedThisFrame) return;
             if (Input.GetKeyDown(KeyCode.E)) TryInteract();
         }
 
@@ -71,6 +90,7 @@ namespace Game01.Adventure
         {
             var run = AdventureRuntime.Run;
             if (run.Completed) return "Percurso concluido / continue explorando ou reinicie.";
+            if (_guide != null && Near(_guide.position)) return "[E] Conversar com o Mago";
             if (!run.EncounterWon && Near(EncounterPosition)) return "[E] Enfrentar o encontro de teste";
             if (Near(MonumentPosition)) return run.EncounterWon
                 ? (run.Era == VisualEra.Primitive ? "[E] Ativar a proxima era visual" : "Marco ativado / procure a saida a leste")
@@ -81,8 +101,14 @@ namespace Game01.Adventure
 
         public bool TryInteract()
         {
-            if (_loading || Body == null) return false;
+            if (_loading || Body == null || Narrative.BlocksExploration || Narrative.InputConsumedThisFrame) return false;
             var run = AdventureRuntime.Run;
+            if (Near(_guide.position))
+            {
+                Body.linearVelocity = Vector2.zero;
+                Narrative.BeginReminder();
+                return true;
+            }
             if (!run.EncounterWon && Near(EncounterPosition) && run.TryBeginEncounter())
             {
                 run.PlayerPosition = Body.position;
@@ -95,6 +121,7 @@ namespace Game01.Adventure
             {
                 _world.Rebuild(run);
                 _actor.Configure("hero", run.Era);
+                _guide.GetComponent<WorldActorView>().Configure("mage", run.Era);
                 return true;
             }
             if (Near(ExitPosition)) return run.TryComplete();

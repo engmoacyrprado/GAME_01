@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Game01.Narrative.Editor;
 
 namespace Game01.Adventure.Editor
 {
@@ -31,6 +32,14 @@ namespace Game01.Adventure.Editor
                 EditorSceneManager.SaveScene(scene, ScenePath);
             }
             else EditorSceneManager.OpenScene(ScenePath);
+            var controller = UnityEngine.Object.FindFirstObjectByType<ExplorationController>();
+            if (controller.Introduction == null)
+            {
+                controller.ConfigureNarrative(IntroductionAssetGenerator.Generate());
+                EditorUtility.SetDirty(controller);
+                EditorSceneManager.MarkSceneDirty(controller.gameObject.scene);
+                EditorSceneManager.SaveScene(controller.gameObject.scene);
+            }
             var scenes = new List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(ScenePath, true),
                 new EditorBuildSettingsScene(CombatPrototypeSceneGenerator.ScenePath, true) };
             foreach (var scene in EditorBuildSettings.scenes)
@@ -45,6 +54,7 @@ namespace Game01.Adventure.Editor
         {
             CombatValidation.Run();
             AdventureValidation.Run();
+            DialogueValidation.Run();
             Generate();
             PlayerSettings.productName = "GAME_01";
             PlayerSettings.defaultScreenWidth = 1280; PlayerSettings.defaultScreenHeight = 720;

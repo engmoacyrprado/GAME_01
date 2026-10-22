@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Game01.Adventure
 {
@@ -12,6 +13,10 @@ namespace Game01.Adventure
         public bool EncounterWon { get; private set; }
         public VisualEra Era { get; private set; }
         public bool Completed { get; private set; }
+        public bool IntroductionSeen { get; set; }
+        private readonly Dictionary<string, string> _responses = new Dictionary<string, string>();
+        public IReadOnlyDictionary<string, string> Responses => _responses;
+        public void RememberResponse(string nodeId, string choiceId) { _responses[nodeId] = choiceId; }
 
         public bool TryBeginEncounter()
         {

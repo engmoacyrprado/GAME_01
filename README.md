@@ -13,6 +13,8 @@ JRPG para PC, com futura adaptacao para celular. A apresentacao evolui de person
 
 Abra Builds/Adventure/GAME_01.exe. Use WASD ou setas para mover e E para interagir perto do objetivo. O percurso conecta exploracao, batalha, retorno ao mapa e uma mudanca visual simplificada entre duas eras. O combate mantem os valores aprovados pelo jogador.
 
+A abertura apresenta a proposta do jogo e uma conversa provisoria. Legendas ficam na parte inferior; um balao indica o falante. Use Continuar/E/Espaco/Enter para avancar e clique nas respostas ou pressione 1/2/3. As conversas nao possuem contador. Aproxime-se do Mago no inicio para conversar novamente.
+
 No Unity, abra Assets/Scenes/ExplorationPrototype.unity. O menu GAME_01 > Adventure > Open Exploration Prototype cria a cena caso falte; Build PC Vertical Slice gera a compilacao com as duas cenas.
 
 Roteiro e limites: docs/exploration-prototype.md. O progresso existe somente durante a execucao; ainda nao ha salvamento em disco.
@@ -49,6 +51,8 @@ As formulas e os valores sao de prototipo. A influencia de Tagmar ainda nao repr
 
 ## Documentos
 
+- docs/project-presentation.md e docs/presentation/GAME_01-projeto.pptx: apresentacao do projeto.
+- docs/dialogue-system.md: formato de falas, respostas e limites narrativos.
 - docs/project-review-2026-10-22.md: revisao, correcoes e limites.
 - docs/combat-system-tagmar-jrpg.md: regras atuais de combate.
 - docs/unity-prototype-setup.md: execucao e verificacao.
